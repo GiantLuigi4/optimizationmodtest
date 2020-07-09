@@ -9,7 +9,10 @@
     "TitleScreenMixin",
     "EntityRenderMixin",
     "BufferBuilderMixin",
-    "WorldRendererMixin"
+    "TileEntityRendererDispatcherMixin",
+    "ChestRendererMixin",
+    "WorldRendererMixin",
+    "ParticleManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

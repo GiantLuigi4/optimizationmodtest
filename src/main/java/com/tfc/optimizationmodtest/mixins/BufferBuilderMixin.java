@@ -1,6 +1,8 @@
 package com.tfc.optimizationmodtest.mixins;
 
 import com.mojang.datafixers.util.Pair;
+import com.tfc.optimizationmodtest.mixin_code.BufferBuilderCode;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -38,9 +40,7 @@ public abstract class BufferBuilderMixin {
 	 */
 	@Overwrite
 	public void begin(int glMode, VertexFormat format) {
-		if (this.isDrawing) {
-//			throw new IllegalStateException("Already building!");
-		} else {
+		if (!this.isDrawing) {
 			this.isDrawing = true;
 			this.drawMode = glMode;
 			this.setVertexFormat(format);
@@ -48,24 +48,5 @@ public abstract class BufferBuilderMixin {
 			this.vertexFormatIndex = 0;
 			((Buffer) this.byteBuffer).clear();
 		}
-	}
-	
-	/**
-	 * @author TFC The Flying Creeper
-	 */
-	@Overwrite
-	public Pair<BufferBuilder.DrawState, ByteBuffer> getNextBuffer() {
-		BufferBuilder.DrawState bufferbuilder$drawstate = this.drawStates.get(this.drawStateIndex++);
-		((Buffer) this.byteBuffer).position(this.uploadedBytes);
-		this.uploadedBytes += bufferbuilder$drawstate.getVertexCount() * bufferbuilder$drawstate.getFormat().getSize();
-		((Buffer) this.byteBuffer).limit(this.uploadedBytes);
-		if (this.drawStateIndex == this.drawStates.size() && this.vertexCount == 0) {
-			this.reset();
-		}
-		
-		ByteBuffer bytebuffer = this.byteBuffer.slice();
-		bytebuffer.order(this.byteBuffer.order()); // FORGE: Fix incorrect byte order
-		((Buffer) this.byteBuffer).clear();
-		return Pair.of(bufferbuilder$drawstate, bytebuffer);
 	}
 }
